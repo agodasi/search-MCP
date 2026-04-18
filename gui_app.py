@@ -3,24 +3,24 @@ import asyncio
 import websockets
 import json
 
-class SearchHistoryItem(ft.ListTile):
+class SearchHistoryItem(ft.Container):
     def __init__(self, query, on_click):
-        self.query = query
-        self.title = ft.Text(query, weight=ft.FontWeight.W_500)
-        self.on_click = on_click
-        self.on_tap = lambda _: on_click(query)
+        super().__init__(
+            content=ft.ListTile(
+                title=ft.Text(query, weight=ft.FontWeight.W_500),
+                on_click=lambda e: on_click(query),
+            )
+        )
 
-class Dashboard(ft.Column):
+class Dashboard(ft.Container):
     def __init__(self, websocket_url):
+        super().__init__()
         self.websocket_url = websocket_url
         self.history = []
         self.current_query = ft.Text("No active search", size=20, weight=ft.FontWeight.BOLD)
         self.status_text = ft.Text("Idle", color=ft.Colors.GREY_500)
         self.preview_text = ft.Text("", size=14)
         self.history_list = ft.Column(scroll=ft.ScrollMode.AUTO, expand=True)
-
-    async def did_mount(self):
-        asyncio.create_task(self.connect_websocket())
 
     async def connect_websocket(self):
         try:
