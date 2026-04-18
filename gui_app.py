@@ -99,7 +99,7 @@ class Dashboard(ft.Container):
                         scroll=ft.ScrollMode.AUTO,
                     ),
                     width=300,
-                    bgcolor=ft.Colors.SURFACE_VARIANT,
+                    bgcolor=ft.Colors.SURFACE,
                     padding=20,
                 ),
                 # Main Area
@@ -145,4 +145,4 @@ async def main(page: ft.Page):
     page.add(dashboard)
 
 if __name__ == "__main__":
-    ft.run(main, view=ft.AppView.WEB_BROWSER)
+    ft.run(main, view=ft.AppView.WEB_BROWSER, port=5400, host="0.0.0.0")

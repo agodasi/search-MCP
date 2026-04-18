@@ -3,6 +3,7 @@ import time
 import signal
 import sys
 import os
+import webbrowser
 
 def run_all():
     processes = []
@@ -38,6 +39,16 @@ def run_all():
         print("Step 3: Starting Monitoring GUI (gui_app.py)...")
         p_gui = subprocess.Popen(["uv", "run", "python", "gui_app.py"])
         processes.append(p_gui)
+        time.sleep(5)  # Wait for GUI to be ready
+
+        # 4. Open browser to Flet GUI
+        print("Step 4: Opening browser...")
+        try:
+            webbrowser.open("http://localhost:5400")
+            print("✅ Browser opened at http://localhost:5400")
+        except Exception as e:
+            print(f"⚠️ Could not open browser automatically: {e}")
+            print("Please manually open http://localhost:5400 in your browser")
 
         print("\n✅ All components are running!")
         print("Press Ctrl+C to stop all processes.")
