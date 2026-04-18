@@ -5,7 +5,6 @@ import json
 
 class SearchHistoryItem(ft.ListTile):
     def __init__(self, query, on_click):
-        super().__init__()
         self.query = query
         self.title = ft.Text(query, weight=ft.FontWeight.W_500)
         self.on_click = on_click
@@ -13,7 +12,6 @@ class SearchHistoryItem(ft.ListTile):
 
 class Dashboard(ft.Column):
     def __init__(self, websocket_url):
-        super().__init__()
         self.websocket_url = websocket_url
         self.history = []
         self.current_query = ft.Text("No active search", size=20, weight=ft.FontWeight.BOLD)
