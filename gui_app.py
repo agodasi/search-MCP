@@ -147,4 +147,4 @@ async def main(page: ft.Page):
     page.add(dashboard)
 
 if __name__ == "__main__":
-    ft.app(target=main, view=ft.AppView.WEB_BROWSER)
+    ft.run(main, view=ft.AppView.WEB_BROWSER)
