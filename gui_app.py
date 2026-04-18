@@ -17,7 +17,7 @@ class Dashboard(ft.Column):
         self.websocket_url = websocket_url
         self.history = []
         self.current_query = ft.Text("No active search", size=20, weight=ft.FontWeight.BOLD)
-        self.status_text = ft.Text("Idle", color=ft.colors.GREY_500)
+        self.status_text = ft.Text("Idle", color=ft.Colors.GREY_500)
         self.preview_text = ft.Text("", size=14)
         self.history_list = ft.Column(scroll=ft.ScrollMode.AUTO, expand=True)
 
@@ -28,7 +28,7 @@ class Dashboard(ft.Column):
         try:
             async with websockets.connect(self.websocket_url) as websocket:
                 self.status_text.value = "Connected to bridge"
-                self.status_text.color = ft.colors.GREEN_400
+                self.status_text.color = ft.Colors.GREEN_400
                 self.update()
                 
                 async for message in websocket:
@@ -36,7 +36,7 @@ class Dashboard(ft.Column):
                     await self.handle_event(data)
         except Exception as e:
             self.status_text.value = f"Connection Error: {str(e)}"
-            self.status_text.color = ft.colors.RED_400
+            self.status_text.color = ft.Colors.RED_400
             self.update()
 
     async def handle_event(self, event):
@@ -47,7 +47,7 @@ class Dashboard(ft.Column):
             query = data.get("query")
             self.current_query.value = f"Searching for: {query}"
             self.status_text.value = "Searching..."
-            self.status_text.color = ft.colors.BLUE_400
+            self.status_text.color = ft.Colors.BLUE_400
             # Add to history if not already there
             if query not in self.history:
                 self.history.append(query)
@@ -56,7 +56,7 @@ class Dashboard(ft.Column):
 
         elif event_type == "search_results":
             self.status_text.value = "Results found"
-            self.status_text.color = ft.colors.GREEN_400
+            self.status_text.color = ft.Colors.GREEN_400
             results = data.get("results", [])
             preview = "\n".join([f"• {res['title']} ({res['href']})" for res in results[:5]])
             self.preview_text.value = preview
@@ -66,18 +66,18 @@ class Dashboard(ft.Column):
             url = data.get("url")
             self.current_query.value = f"Extracting: {url}"
             self.status_text.value = "Extracting content..."
-            self.status_text.color = ft.colors.BLUE_400
+            self.status_text.color = ft.Colors.BLUE_400
             self.update()
 
         elif event_type == "content_extracted":
             self.status_text.value = "Content extracted"
-            self.status_text.color = ft.colors.GREEN_400
+            self.status_text.color = ft.Colors.GREEN_400
             self.preview_text.value = "Content extracted successfully. Check tool output in MCP."
             self.update()
 
         elif event_type == "error":
             self.status_text.value = "Error occurred"
-            self.status_text.color = ft.colors.RED_400
+            self.status_text.color = ft.Colors.RED_400
             self.preview_text.value = f"Error: {data.get('error') or data.get('msg', 'Unknown error')}"
             self.update()
 
@@ -101,7 +101,7 @@ class Dashboard(ft.Column):
                         scroll=ft.ScrollMode.AUTO,
                     ),
                     width=300,
-                    bgcolor=ft.colors.SURFACE_VARIANT,
+                    bgcolor=ft.Colors.SURFACE_VARIANT,
                     padding=20,
                 ),
                 # Main Area
@@ -123,7 +123,7 @@ class Dashboard(ft.Column):
                             ft.Container(
                                 content=ft.Text(self.preview_text, size=14),
                                 expand=True,
-                                bgcolor=ft.colors.BLACK12,
+                                bgcolor=ft.Colors.BLACK12,
                                 padding=15,
                                 border_radius=10,
                             ),
