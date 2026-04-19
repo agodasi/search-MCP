@@ -21,6 +21,7 @@ logs/
 .coverage
 coverage.xml
 htmlcov/
+scratch/
 
 # IDEs and OS
 .vscode/
@@ -33,3 +34,5 @@ htmlcov/
 
 # Agent temporary files
 .agents_tmp/
+temp_*.py
+test_*.py
