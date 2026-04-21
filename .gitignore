@@ -33,6 +33,7 @@ scratch/
 # Environment
 .env
 .env.*
+config.json
 
 # Agent temporary files
 .agents_tmp/
