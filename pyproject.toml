@@ -12,6 +12,7 @@ dependencies = [
     "flet>=0.84.0",
     "flet-desktop>=0.84.0",
     "mcp>=1.27.0",
+    "pyinstaller>=6.19.0",
     "requests>=2.33.1",
     "uvicorn[standard]>=0.44.0",
     "websockets>=16.0",
