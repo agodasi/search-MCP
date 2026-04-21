@@ -16,8 +16,16 @@ mcp = FastMCP("Search-MCP")
 search_engine = SearchEngine()
 content_extractor = ContentExtractor()
 
+import os
+import sys
+# Ensure config_manager is accessible
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from config_manager import load_config
+_config = load_config()
+_PORT = _config.get("port", 8002)
+
 # Bridge URL for notifications
-BRIDGE_URL = "http://localhost:8002/event"
+BRIDGE_URL = f"http://localhost:{_PORT}/event"
 
 async def notify_bridge(event_type: str, data: dict):
     """
@@ -91,7 +99,8 @@ async def listen_to_bridge():
     """
     import websockets
     import json
-    ws_url = "ws://localhost:8002/ws"
+    global _PORT
+    ws_url = f"ws://localhost:{_PORT}/ws"
     
     while True:
         try:

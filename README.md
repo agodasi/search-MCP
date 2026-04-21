@@ -1,212 +1,104 @@
 # Search-MCP (リアルタイム・モニタリングGUI付き)
 
-Search-MCPは、DuckDuckGo検索とウェブコンテンツ抽出の2つの強力なツールを提供するModel Context Protocol (MCP) サーバーです。
-
-このプロジェクトの最大の特徴は、**リアルタイム・モニタリング・ダッシュボード**を備えていることです。標準的なMCPサーバーはバックグラウンドで静かに動作しますが、Search-MCPにはモダンなデスクトップGUIが含まれており、LLMが何を検索し、ウェブからどのようなコンテンツを抽出しているかを、実行中の様子をそのまま視覚的に確認できます。
+Search-MCPは、 DuckDuckGo検索とウェブコンテンツ抽出の2つのツールを提供するModel Context Protocol (MCP) サーバーです。
+モダンなデスクトップGUI（Flet製）を備えており、LLMがバックグラウンドで行っている検索やコンテンツ抽出の様子をリアルタイムで視覚的に監視できます。
 
 ## ✨ 特徴
 
-- **DuckDuckGo検索**: ウェブ上の情報を素早く検索。
-- **コンテンツ抽出**: 任意のURLからクリーンなテキストコンテンツを抽出。(User-Agentによるボット検知回避とエンコーディング自動補正機能付き)
-- **リアルタイム・モニタリング**: Fletで構築された、美しいダークモード対応のダッシュボード。
-- **サイドカー・アーキテクチャ**: FastAPI/WebSocketブリッジを使用し、GUIがMCPサーバーから独立して動作することを保証。
+- **DuckDuckGo検索**: 最新のウェブ情報を検索。
+- **コンテンツ抽出**: サイトからテキストを抽出。(User-Agentによる回避・文字コード自動判補正機能付き)
+- **統合ダッシュボード**: 履歴・結果・コンテンツ閲覧を1画面に統合したモダンなレイアウト。
+- **カスタマイズ機能**: 
+    - **ダーク/ライトモード**: 外観の即時切り替え。
+    - **多言語対応**: 日本語と英語をサポート。
+    - **ポート設定**: 通信ポートの自由な変更。
+- **Windows インストーラー対応**: `installer.iss` を使用して簡単に配布可能な `.exe` 形式にパッケージ化可能。
 
 ## 🏗 アーキテクチャ
 
-システムは主に3つのコンポーネントで構成されています：
+1.  **MCPサーバー (`main.py --mode mcp`)**: 実際のサーチ・スクレイピング処理。
+2.  **通信ブリッジ (`main.py --mode bridge`)**: 各プロセス間の通知をブロードキャストする中継器。
+3.  **モニタリングGUI (`main.py --mode gui`)**: 設定変更とリアルタイム表示を行うフロントエンド。
 
-1.  **MCPサーバー (\`mcp_server.py\`)**: 実際のツールを実装。ツールが呼び出されるたびにブリッジへ通知を送信します。
-2.  **通信ブリッジ (\`bridge.py\`)**: 軽量なFastAPIサーバー。MCPサーバーからのイベントを受け取り、WebSocket経由でGUIへブロードキャストします。
-3.  **モニタリングGUI (\`gui_app.py\`)**: Fletベースのダッシュボード。ブリッジに接続し、検索履歴やサイトコンテンツの閲覧、機能停止操作をグラフィカルに行えます。
+## 🚀 実行方法
 
-## 🚀 はじめに
+### 依存関係のインストール
+```bash
+uv sync
+```
 
-### 前提条件
+### システムの一括起動（推奨）
+すべてを一度に起動し、統合的に管理します：
+```bash
+uv run python main.py --mode all
+```
 
-- **Python 3.10以上**
-- **\`uv\`** (高速な依存関係管理のために推奨)
+*(個別に起動する場合は、`--mode bridge`, `--mode mcp`, `--mode gui` をそれぞれ指定して実行してください)*
 
-### インストール
+## 🤖 Claude Desktop / Cursor での使用
 
-1. リポジトリをクローンします：
-   \`\`\`bash
-   git clone [<your-repo-url>](https://github.com/agodasi/search-MCP)
-   cd search-MCP
-   \`\`\`
+`config.json` を開いて、以下の実行ファイルを指定してください：
 
-2. \`uv\` を使用して依存関係をインストールします：
-   \`\`\`bash
-   uv sync
-   \`\`\`
-
-### 実行方法
-
-すべてのコンポーネントを一度に起動するには、`run_all.py` を使用してください。これが最も簡単な方法です。
-
-\`\`\`bash
-uv run python run_all.py
-\`\`\`
-*(これによりBridge、MCPサーバー、GUIの全プロセスが順次起動し、終了時は一括でシャットダウンされます）*
-
-個別に実行する場合は、システムが正しく連携できるように以下の順序で起動してください：
-
-**1. ブリッジの起動 (通信レイヤー)**
-\`\`\`bash
-uv run python bridge.py
-\`\`\`
-*ブリッジは \`http://localhost:8002\` で動作します。*
-
-**2. MCPサーバーの起動**
-\`\`\`bash
-uv run python mcp_server.py
-\`\`\`
-
-**3. モニタリングGUIの起動**
-\`\`\`bash
-uv run python gui_app.py
-\`\`\`
-*GUIはデフォルトでネイティブなデスクトップアプリとして開きます。ウェブブラウザで開きたい場合は引数に `--web` を付与してください。*
-
-## 🤖 Claude Desktopでの使用方法
-
-Claude Desktopでツールを使用するには、\`claude_desktop_config.json\` に以下を追加してください：
-
-\`\`\`json
+```json
 {
   "mcpServers": {
     "search-mcp": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/your/search-MCP",
-        "run",
-        "python",
-        "mcp_server.py"
-      ]
+      "command": "path/to/search-mcp.exe",
+      "args": ["--mode", "mcp"]
     }
   }
 }
-\`\`\`
-
-*注意: Claudeを起動する前に、別のターミナルで `uv run python bridge.py` と `uv run python gui_app.py` を実行しておくか、事前に `run_all.py` でシステム全体を起動しておいてください。ブリッジが起動していないと、サーバーからの通知が失敗しGUIが更新されません！*
-
-## 🛠 ツール
-
-### \`search\`
-指定したクエリでDuckDuckGo検索を実行します。
-- **引数**: \`query\` (string) - 検索語。
-- **戻り値**: タイトル、URL、スニペットのフォーマット済みリスト。
-
-### \`fetch_content\`
-指定したURLからテキストコンテンツを抽出します。
-- **引数**: \`url\` (string) - スクレイピングするURL。
-- **戻り値**: ページのクリーンなテキストコンテンツ。
+```
 
 ---
 
 # Search-MCP with Real-time Monitoring GUI
 
-Search-MCP is an Model Context Protocol (MCP) server that provides two powerful tools: DuckDuckGo search and web content extraction. 
-
-What makes this project unique is its **real-time monitoring dashboard**. While standard MCP servers operate silently in the background, Search-MCP includes a modern desktop GUI that allows you to see exactly what the LLM is searching for and what content it is extracting from the web, as it happens.
+Search-MCP is a Model Context Protocol (MCP) server providing DuckDuckGo search and web content extraction. 
+It features a modern Flet-based desktop GUI, allowing you to visually monitor background LLM activity like search queries and scraped results in real-time.
 
 ## ✨ Features
 
-- **DuckDuckGo Search**: Quickly find information across the web.
-- **Content Extraction**: Scrape clean text content from any URL (includes bot-detection bypass using realistic User-Agents and automated character encoding handling).
-- **Real-time Monitoring**: A beautiful, dark-mode dashboard built with Flet.
-- **Sidecar Architecture**: Uses a FastAPI/WebSocket bridge to ensure the GUI remains decoupled from the MCP server.
+- **DuckDuckGo Search**: Find the latest web information quickly.
+- **Content Extraction**: Clean text extraction with bot-bypass (User-Agent) and auto-encoding detection.
+- **Integrated Dashboard**: Single-pane layout for History, Results, and Page Content.
+- **Customizable**: 
+    - **Theme**: Instant toggle between Dark and Light modes.
+    - **Localization**: Supports English (Default) and Japanese.
+    - **Network**: Configurable communication ports.
+- **Windows Packaging**: Includes Inno Setup scripts to build a standalone `.exe` installer.
 
 ## 🏗 Architecture
 
-The system consists of three main components working in harmony:
+1.  **MCP Server (`main.py --mode mcp`)**: Handles tool execution and sends events to the bridge.
+2.  **Bridge (`main.py --mode bridge`)**: Acts as a hub, broadcasting events via WebSockets.
+3.  **GUI (`main.py --mode gui`)**: Displays real-time data and manages settings (saved in `config.json`).
 
-1.  **MCP Server (\`mcp_server.py\`)**: Implements the actual tools. Every time a tool is called, it sends a notification to the bridge.
-2.  **Communication Bridge (\`bridge.py\`)**: A lightweight FastAPI server that receives events from the MCP server and broadcasts them via WebSockets.
-3.  **Monitoring GUI (\`gui_app.py\`)**: A Flet-based dashboard that connects to the bridge and displays search history, live page contents, and provides a graphical stop system button.
+## 🚀 Execution
 
-## 🚀 Getting Started
+### Setup
+```bash
+uv sync
+```
 
-### Prerequisites
+### Launch Everything (Recommended)
+```bash
+uv run python main.py --mode all
+```
 
-- **Python 3.10+**
-- **\`uv\`** (recommended for fast dependency management)
+*(To run individual components, use `--mode bridge`, `--mode mcp`, or `--mode gui` separately.)*
 
-### Installation
+## 🤖 Usage with Claude / Cursor
 
-1. Clone this repository:
-   \`\`\`bash
-   git clone [<your-repo-url>](https://github.com/agodasi/search-MCP)
-   cd search-MCP
-   \`\`\`
+Update your MCP configuration file to point to the executable:
 
-2. Install dependencies using \`uv\`:
-   \`\`\`bash
-   uv sync
-   \`\`\`
-
-### Running the System
-
-To use the full monitoring experience easily, you can launch all components simultaneously using the included runner:
-
-\`\`\`bash
-uv run python run_all.py
-\`\`\`
-*(This sequentially starts the Bridge, MCP server, and GUI, bringing them down gracefully upon termination)*
-
-If you prefer to run them individually, follow these steps in separate terminal windows:
-
-**1. Start the Bridge (Communication Layer)**
-\`\`\`bash
-uv run python bridge.py
-\`\`\`
-*The bridge will run on \`http://localhost:8002\`.*
-
-**2. Start the MCP Server**
-\`\`\`bash
-uv run python mcp_server.py
-\`\`\`
-
-**3. Start the Monitoring GUI**
-\`\`\`bash
-uv run python gui_app.py
-\`\`\`
-*The GUI will open as a native desktop application by default. Use the \`--web\` argument to run it in a browser instead.*
-
-## 🤖 Usage with Claude Desktop
-
-To use the tools within Claude Desktop, add the following to your \`claude_desktop_config.json\`:
-
-\`\`\`json
+```json
 {
   "mcpServers": {
     "search-mcp": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/your/search-MCP",
-        "run",
-        "python",
-        "mcp_server.py"
-      ]
+      "command": "path/to/search_mcp.exe",
+      "args": ["--mode", "mcp"]
     }
   }
 }
-\`\`\`
-
-*Note: Make sure the **Bridge & GUI** components are running in a separate terminal via `run_all.py` (or individually) before you use the MCP server in Claude. Otherwise, the server will fail to push notifications and the GUI won't receive updates!*
-
-## 🛠 Tools
-
-### \`search\`
-Performs a DuckDuckGo search for a given query.
-- **Parameter**: \`query\` (string) - The search term.
-- **Returns**: A formatted list of titles, URLs, and snippets.
-
-### \`fetch_content\`
-Extracts the text content from a specific URL.
-- **Parameter**: \`url\` (string) - The URL to scrape.
-- **Returns**: The cleaned text content of the page.
-
-## 📝 License
-This project is open source.
+```

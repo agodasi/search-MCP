@@ -90,7 +90,10 @@ def main():
     elif args.mode == "bridge":
         import bridge
         import uvicorn
-        uvicorn.run(bridge.app, host="0.0.0.0", port=8002)
+        from config_manager import load_config
+        config = load_config()
+        port = config.get("port", 8002)
+        uvicorn.run(bridge.app, host="0.0.0.0", port=port)
         sys.exit(0)
         
     elif args.mode == "gui":
