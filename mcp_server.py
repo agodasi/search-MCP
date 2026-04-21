@@ -25,7 +25,10 @@ async def notify_bridge(event_type: str, data: dict):
     """
     async with httpx.AsyncClient() as client:
         try:
-            payload = {"type": event_type, "data": data}
+            import json
+            # Ensure data is strictly JSON serializable (fixes 500 error on bridge if results contain un-serializable types)
+            safe_data = json.loads(json.dumps(data, default=str))
+            payload = {"type": event_type, "data": safe_data}
             await client.post(BRIDGE_URL, json=payload)
         except Exception as e:
             logger.error(f"Failed to notify bridge: {e}")
@@ -53,7 +56,7 @@ async def search(query: str) -> str:
         return "\n".join(formatted_results)
     except Exception as e:
         error_msg = f"Search failed: {str(e)}"
-        await notify_bridge("error", {"query": query, "error": error_msg})
+        await notify_bridge("error", {"query": query, "error": error_msg, "source": "search"})
         return error_msg
 
 @mcp.tool()
@@ -79,7 +82,7 @@ async def fetch_content(url: str) -> str:
         return text
     except Exception as e:
         error_msg = f"Content extraction failed: {str(e)}"
-        await notify_bridge("error", {"url": url, "error": error_msg})
+        await notify_bridge("error", {"url": url, "error": error_msg, "source": "fetch"})
         return error_msg
 
 async def listen_to_bridge():

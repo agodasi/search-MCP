@@ -53,8 +53,9 @@ class ResultCard(ft.Container):
         e.control.update()
 
 class Dashboard(ft.Container):
-    def __init__(self, websocket_url):
+    def __init__(self, websocket_url, page: ft.Page):
         super().__init__()
+        self.page_ref = page
         self.websocket_url = websocket_url
         self.expand = True
         self.bgcolor = BG_COLOR
@@ -169,7 +170,19 @@ class Dashboard(ft.Container):
             self.status_lamp.bgcolor = ERROR_COLOR
             self.status_text.value = "Error Occurred"
             self.progress_bar.visible = False
-            self.results_column.controls.append(ft.Text(f"Error: {data.get('error')}", color=ERROR_COLOR))
+            
+            error_msg = data.get("error", "Unknown error")
+            source = data.get("source", "search")
+            
+            if source == "fetch":
+                self.content_viewer.controls = [
+                    ft.Text("FETCH ERROR", weight=ft.FontWeight.BOLD, color=ERROR_COLOR),
+                    ft.Text(data.get("url", "Unknown URL"), size=11, color=ft.Colors.WHITE30),
+                    ft.Divider(color=ft.Colors.WHITE10),
+                    ft.Text(error_msg, size=13, color=ERROR_COLOR)
+                ]
+            else:
+                self.results_column.controls.append(ft.Text(f"Error: {error_msg}", color=ERROR_COLOR))
             self.update()
 
     def set_query(self, query):
@@ -217,7 +230,7 @@ class Dashboard(ft.Container):
                 color=ft.Colors.WHITE, 
                 bgcolor=ERROR_COLOR,
                 on_click=self.stop_app,
-                visible=sys.platform != "web" # Hide on web
+                visible=not self.page_ref.web # Hide on web
             )
         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
@@ -279,7 +292,7 @@ async def main(page: ft.Page):
     page.padding = 0
     page.spacing = 0
     
-    dashboard = Dashboard("ws://localhost:8002/ws")
+    dashboard = Dashboard("ws://localhost:8002/ws", page)
     page.add(dashboard)
     
     asyncio.create_task(dashboard.connect_websocket())
