@@ -34,17 +34,32 @@ def run_all_mode():
             creationflags = subprocess.CREATE_NO_WINDOW
 
         print("Step 1: Starting Communication Bridge...")
-        p_bridge = subprocess.Popen(get_launch_command("bridge"), creationflags=creationflags)
+        p_bridge = subprocess.Popen(
+            get_launch_command("bridge"), 
+            creationflags=creationflags,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
         processes.append(p_bridge)
         time.sleep(3)
 
         print("Step 2: Starting MCP Server...")
-        p_mcp = subprocess.Popen(get_launch_command("mcp"), creationflags=creationflags)
+        p_mcp = subprocess.Popen(
+            get_launch_command("mcp"), 
+            creationflags=creationflags,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
         processes.append(p_mcp)
         time.sleep(3)
 
         print("Step 3: Starting Monitoring GUI...")
-        p_gui = subprocess.Popen(get_launch_command("gui"), creationflags=creationflags)
+        p_gui = subprocess.Popen(
+            get_launch_command("gui"), 
+            creationflags=creationflags,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
         processes.append(p_gui)
         time.sleep(2)
 
