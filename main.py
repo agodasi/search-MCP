@@ -28,18 +28,23 @@ def run_all_mode():
     signal.signal(signal.SIGINT, signal_handler)
 
     try:
+        # On Windows, use CREATE_NO_WINDOW to prevent child console windows
+        creationflags = 0
+        if sys.platform == "win32":
+            creationflags = subprocess.CREATE_NO_WINDOW
+
         print("Step 1: Starting Communication Bridge...")
-        p_bridge = subprocess.Popen(get_launch_command("bridge"))
+        p_bridge = subprocess.Popen(get_launch_command("bridge"), creationflags=creationflags)
         processes.append(p_bridge)
         time.sleep(3)
 
         print("Step 2: Starting MCP Server...")
-        p_mcp = subprocess.Popen(get_launch_command("mcp"))
+        p_mcp = subprocess.Popen(get_launch_command("mcp"), creationflags=creationflags)
         processes.append(p_mcp)
         time.sleep(3)
 
         print("Step 3: Starting Monitoring GUI...")
-        p_gui = subprocess.Popen(get_launch_command("gui"))
+        p_gui = subprocess.Popen(get_launch_command("gui"), creationflags=creationflags)
         processes.append(p_gui)
         time.sleep(2)
 
