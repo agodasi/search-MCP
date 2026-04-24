@@ -8,9 +8,18 @@ import signal
 def get_launch_command(mode):
     """Get the correct command to launch a child process in both python and PyInstaller frozen modes."""
     if getattr(sys, 'frozen', False):
+        # When frozen, sys.executable is the .exe itself. 
+        # We use the same .exe with a different mode flag.
         return [sys.executable, "--mode", mode]
     else:
         return [sys.executable, sys.argv[0], "--mode", mode]
+
+def suppress_output():
+    """Redirect stdout and stderr to devnull to prevent any console interaction."""
+    if getattr(sys, 'frozen', False):
+        f = open(os.devnull, 'w')
+        sys.stdout = f
+        sys.stderr = f
 
 def run_all_mode():
     print("Starting Search-MCP System (All-in-one Mode)...")
@@ -90,6 +99,9 @@ def main():
     # GUI modes specific arguments (like Flet's internal arguments) might cause issues if parse_args is strict.
     # We use parse_known_args in case Flet appends arguments behind the scenes.
     args, _ = parser.parse_known_args()
+    
+    # Suppress console output for frozen executables
+    suppress_output()
 
     if args.mode == "mcp":
         import mcp_server
@@ -122,11 +134,18 @@ def main():
         # Since we changed app startup recently in gui_app
         # Make sure gui_app.py uses main directly
         # Check if FLET_WEB_PORT or --web exists
+        # Use the assets directory relative to the script/exe
+        if getattr(sys, 'frozen', False):
+            base_dir = sys._MEIPASS
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_dir = os.path.join(base_dir, "assets")
+        
         if os.getenv("FLET_WEB_PORT") or "--web" in sys.argv:
             port = int(os.getenv("FLET_WEB_PORT", 8550))
-            ft.app(target=gui_app.main, view=ft.AppView.WEB_BROWSER, port=port)
+            ft.app(target=gui_app.main, view=ft.AppView.WEB_BROWSER, port=port, assets_dir=assets_dir)
         else:
-            ft.app(target=gui_app.main)
+            ft.app(target=gui_app.main, assets_dir=assets_dir)
         sys.exit(0)
         
     elif args.mode == "all":

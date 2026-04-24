@@ -1,7 +1,7 @@
 [Setup]
 ; App Information
 AppName=Search-MCP
-AppVersion=1.1
+AppVersion=1.01
 AppPublisher=agodasi
 AppPublisherURL=https://github.com/agodasi/search-MCP
 
@@ -18,8 +18,11 @@ SolidCompression=yes
 ; Admin privileges required for {autopf}
 PrivilegesRequired=admin
 
+; Icon for the setup installer itself
+SetupIconFile=icon.ico
+
 ; Icon for the uninstaller
-UninstallDisplayIcon={app}\search_mcp.exe
+UninstallDisplayIcon={app}\icon.ico
 
 ; Language Support
 [Languages]
@@ -28,13 +31,15 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [Files]
 ; Source files from PyInstaller output
-Source: "dist\search_mcp\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\search_mcp.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; Start Menu
-Name: "{group}\Search-MCP"; Filename: "{app}\search_mcp.exe"; Parameters: "--mode all"
+Name: "{group}\Search-MCP"; Filename: "{app}\search_mcp.exe"; Parameters: "--mode all"; IconFilename: "{app}\icon.ico"
 ; Desktop (Optional task)
-Name: "{autodesktop}\Search-MCP"; Filename: "{app}\search_mcp.exe"; Parameters: "--mode all"; Tasks: desktopicon
+Name: "{autodesktop}\Search-MCP"; Filename: "{app}\search_mcp.exe"; Parameters: "--mode all"; Tasks: desktopicon; IconFilename: "{app}\icon.ico"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked

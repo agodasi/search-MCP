@@ -457,6 +457,19 @@ async def main(page: ft.Page):
     page.bgcolor = BG_COLOR_DARK if page.theme_mode == ft.ThemeMode.DARK else BG_COLOR_LIGHT
     page.window.width = 1400
     page.window.height = 900
+    
+    # Set window icon with absolute path resolution for frozen mode
+    if getattr(sys, 'frozen', False):
+        # When frozen, assets are in sys._MEIPASS/assets
+        icon_path = os.path.join(sys._MEIPASS, "assets", "icon.ico")
+        if not os.path.exists(icon_path):
+            icon_path = os.path.join(sys._MEIPASS, "assets", "icon.png")
+    else:
+        # In dev mode, flet handles relative paths via assets_dir
+        icon_path = "icon.ico"
+    
+    page.window.icon = icon_path
+    
     page.padding = 0
     page.spacing = 0
     
